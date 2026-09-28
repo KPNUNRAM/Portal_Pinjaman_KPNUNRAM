@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPN UNRAM - Koperasi Pegawai Negeri Universitas Mataram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        unram: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            900: '#78350f',
+                            navy: '#1e3a8a',
+                            darknavy: '#172554'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 font-sans flex flex-col antialiased text-slate-800">
+
+    <header class="bg-unram-navy text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navigate('home')">
+                <div class="w-11 h-11 rounded-2xl bg-unram-500 flex items-center justify-center text-unram-navy font-bold text-xl shadow-lg transform transition hover:scale-105">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg sm:text-xl font-bold tracking-tight">KPN UNRAM</h1>
+                        <span id="gas-badge" class="px-2 py-0.5 text-[10px] font-bold bg-amber-400 text-unram-navy rounded-full uppercase tracking-wide">Wallpaper Mode</span>
+                    </div>
+                    <p class="text-xs text-amber-300 font-medium hidden sm:block">Koperasi Pegawai Negeri Universitas Mataram</p>
+                </div>
+            </div>
+            <div id="nav-actions" class="flex items-center space-x-3">
+                <!-- Dynamic Nav Buttons -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 transform transition-all scale-95 opacity-0" id="modal-content">
+            <div id="modal-icon" class="w-12 h-12 rounded-full flex items-center justify-center text-2xl mb-4 mx-auto"></div>
+            <h3 id="modal-title" class="text-lg font-bold text-center text-slate-900 mb-2"></h3>
+            <p id="modal-message" class="text-sm text-slate-600 text-center mb-6 leading-relaxed"></p>
+            <div class="flex justify-center space-x-3" id="modal-actions">
+                <button onclick="app.closeModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-xl text-sm transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Modal -->
+    <div id="doc-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full p-6 relative">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+                <h3 id="doc-modal-title" class="text-lg font-bold text-slate-900">Pratinjau Dokumen</h3>
+                <button onclick="app.closeDocModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="text-center max-h-[70vh] overflow-auto p-2">
+                <img id="doc-modal-img" src="" class="max-w-full h-auto mx-auto rounded-xl border border-slate-200 shadow-md">
+            </div>
+        </div>
+    </div>
+
+    <!-- Slides Modal -->
+    <div id="slides-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full p-6 relative flex flex-col h-[85vh]">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4 shrink-0">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center">
+                    <i class="fa-solid fa-person-chalkboard text-unram-navy mr-2"></i> Slideshow Anggota Belum Setor
+                </h3>
+                <button onclick="app.closeSlidesModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-grow w-full h-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
+                <iframe src="https://docs.google.com/presentation/d/1UsI9YfMIWMChZNNs-HNaw851p482gsoM/embed?start=false&loop=false&delayms=3000" frameborder="0" width="100%" height="100%" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+            </div>
+            <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-200 mt-4 shrink-0 text-xs gap-3">
+                <span class="text-slate-500">Sumber: Google Presentation Resmi KPN UNRAM</span>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="window.open(DOC_LINKS.belumSetor.view, '_blank')" class="px-3 py-1.5 bg-unram-navy text-white rounded-xl font-bold shadow hover:bg-blue-900">Buka Tab Baru</button>
+                    <button onclick="window.open(DOC_LINKS.belumSetor.downloadPdf, '_blank')" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold shadow hover:bg-rose-700">Unduh PDF</button>
+                    <button onclick="window.open(DOC_LINKS.belumSetor.downloadPptx, '_blank')" class="px-3 py-1.5 bg-amber-500 text-unram-navy rounded-xl font-bold shadow hover:bg-amber-400">Unduh PPTX</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="app-view">
+            <!-- Dynamically rendered views -->
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between text-sm gap-4">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-shield-halved text-unram-500"></i>
+                <span>Sistem Informasi Koperasi Pegawai Negeri Universitas Mataram &copy; 2026</span>
+            </div>
+            <div class="flex items-center space-x-4 text-xs text-slate-400">
+                <span>Standalone Wallpaper Ready</span>
+                <span>&bull;</span>
+                <span>Bantuan IT KPN UNRAM</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const FACULTIES = [
+            "Kantor Pusat",
+            "Fak. Kedokteran",
+            "Fak. IKIP",
+            "Fak. Pertanian",
+            "Fak. Peternakan",
+            "Fak. Hukum",
+            "Fak. Ekonomi",
+            "Fak. Teknik",
+            "Fak. Teknologi Pangan",
+            "Fak. MIPA"
+        ];
+
+        const WALLPAPER_URL = "https://lh3.googleusercontent.com/d/101IT4slqV-5AMfPzab4_ys71W5sebnrn";
+
+        const DOC_LINKS = {
+            blangko: {
+                id: '1JD-LvWyeMW9nSCFYyDwdfuG7a2Uxq844',
+                view: 'https://docs.google.com/document/d/1JD-LvWyeMW9nSCFYyDwdfuG7a2Uxq844/edit?usp=drive_link',
+                downloadDocx: 'https://docs.google.com/document/d/1JD-LvWyeMW9nSCFYyDwdfuG7a2Uxq844/export?format=docx',
+                downloadPdf: 'https://docs.google.com/document/d/1JD-LvWyeMW9nSCFYyDwdfuG7a2Uxq844/export?format=pdf'
+            },
+            perjanjian: {
+                id: '1uVhJaH1uUOszAPVkIFxYY35csIu9KW8M',
+                view: 'https://docs.google.com/document/d/1uVhJaH1uUOszAPVkIFxYY35csIu9KW8M/edit?usp=drive_link',
+                downloadDocx: 'https://docs.google.com/document/d/1uVhJaH1uUOszAPVkIFxYY35csIu9KW8M/export?format=docx',
+                downloadPdf: 'https://docs.google.com/document/d/1uVhJaH1uUOszAPVkIFxYY35csIu9KW8M/export?format=pdf'
+            },
+            belumSetor: {
+                id: '1UsI9YfMIWMChZNNs-HNaw851p482gsoM',
+                view: 'https://docs.google.com/presentation/d/1UsI9YfMIWMChZNNs-HNaw851p482gsoM/edit?usp=drive_link',
+                downloadPdf: 'https://docs.google.com/presentation/d/1UsI9YfMIWMChZNNs-HNaw851p482gsoM/export/pdf',
+                downloadPptx: 'https://docs.google.com/presentation/d/1UsI9YfMIWMChZNNs-HNaw851p482gsoM/export/pptx'
+            }
+        };
+
+        class KpnApp {
+            constructor() {
+                this.initStorage();
+                this.currentUser = JSON.parse(localStorage.getItem('kpn_current_user')) || null;
+                this.currentView = this.currentUser ? (this.currentUser.isAdmin ? 'admin_dashboard' : 'user_dashboard') : 'home';
+                this.adminUnitFilter = 'Semua';
+                this.render();
+            }
+
+            initStorage() {
+                let users = JSON.parse(localStorage.getItem('kpn_users')) || [];
+                
+                const adminIndex = users.findIndex(u => u.nip === 'admin');
+                const adminData = {
+                    name: 'Administrator KPN',
+                    nip: 'admin',
+                    birthplace: 'Mataram',
+                    phone: '081234567890',
+                    golongan: 'Pengurus KPN',
+                    status: 'Administrator',
+                    unit: 'Kantor Pusat',
+                    photo: 'https://placehold.co/150x150/1e3a8a/ffffff?text=Admin',
+                    password: 'admin1234567890123',
+                    isAdmin: true
+                };
+
+                if (adminIndex !== -1) {
+                    users[adminIndex] = { ...users[adminIndex], ...adminData };
+                } else {
+                    users.unshift(adminData);
+                }
+                localStorage.setItem('kpn_users', JSON.stringify(users));
+
+                const currentUser = JSON.parse(localStorage.getItem('kpn_current_user'));
+                if (currentUser && currentUser.nip === 'admin') {
+                    currentUser.password = 'admin1234567890123';
+                    localStorage.setItem('kpn_current_user', JSON.stringify(currentUser));
+                }
+
+                if (!localStorage.getItem('kpn_loans')) {
+                    localStorage.setItem('kpn_loans', JSON.stringify([]));
+                }
+            }
+
+            navigate(view) {
+                this.currentView = view;
+                this.render();
+                window.scrollTo(0, 0);
+            }
+
+            showAlert(title, message, type = 'info', callback = null) {
+                const modal = document.getElementById('custom-modal');
+                const content = document.getElementById('modal-content');
+                const icon = document.getElementById('modal-icon');
+                const titleEl = document.getElementById('modal-title');
+                const msgEl = document.getElementById('modal-message');
+                const actionsEl = document.getElementById('modal-actions');
+
+                titleEl.textContent = title;
+                msgEl.textContent = message;
+
+                icon.className = 'w-12 h-12 rounded-full flex items-center justify-center text-2xl mb-4 mx-auto ';
+                if (type === 'success') {
+                    icon.classList.add('bg-emerald-100', 'text-emerald-600');
+                    icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                } else if (type === 'error') {
+                    icon.classList.add('bg-rose-100', 'text-rose-600');
+                    icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                } else {
+                    icon.classList.add('bg-amber-100', 'text-amber-600');
+                    icon.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+                }
+
+                actionsEl.innerHTML = `<button id="modal-ok-btn" class="px-5 py-2.5 bg-unram-navy hover:bg-blue-900 text-white font-medium rounded-xl text-sm transition shadow">OK</button>`;
+                document.getElementById('modal-ok-btn').onclick = () => {
+                    this.closeModal();
+                    if (callback) callback();
+                };
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+
+            showConfirm(title, message, onConfirm) {
+                const modal = document.getElementById('custom-modal');
+                const content = document.getElementById('modal-content');
+                const icon = document.getElementById('modal-icon');
+                const titleEl = document.getElementById('modal-title');
+                const msgEl = document.getElementById('modal-message');
+                const actionsEl = document.getElementById('modal-actions');
+
+                titleEl.textContent = title;
+                msgEl.textContent = message;
+
+                icon.className = 'w-12 h-12 rounded-full flex items-center justify-center text-2xl mb-4 mx-auto bg-rose-100 text-rose-600';
+                icon.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+
+                actionsEl.innerHTML = `
+                    <button onclick="app.closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-xl text-sm transition">Batal</button>
+                    <button id="modal-confirm-btn" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition shadow">Ya, Hapus Permanen</button>
+                `;
+                document.getElementById('modal-confirm-btn').onclick = () => {
+                    this.closeModal();
+                    if (onConfirm) onConfirm();
+                };
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+
+            closeModal() {
+                const modal = document.getElementById('custom-modal');
+                const content = document.getElementById('modal-content');
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => { modal.classList.add('hidden'); }, 200);
+            }
+
+            confirmDeleteMember(nip, name) {
+                this.showConfirm(
+                    'Hapus Anggota Permanen',
+                    `Apakah Anda yakin ingin menghapus anggota "${name}" (NIP: ${nip}) beserta seluruh data pinjamannya secara permanen?`,
+                    () => {
+                        let users = JSON.parse(localStorage.getItem('kpn_users')) || [];
+                        users = users.filter(u => u.nip !== nip);
+                        localStorage.setItem('kpn_users', JSON.stringify(users));
+
+                        let loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                        loans = loans.filter(l => l.nip !== nip);
+                        localStorage.setItem('kpn_loans', JSON.stringify(loans));
+
+                        this.showAlert('Berhasil Dihapus', `Anggota ${name} telah dihapus secara permanen.`, 'success', () => {
+                            this.render();
+                        });
+                    }
+                );
+            }
+
+            render() {
+                this.renderNavActions();
+
+                const container = document.getElementById('app-view');
+                switch(this.currentView) {
+                    case 'home':
+                        container.innerHTML = this.renderHomeView();
+                        break;
+                    case 'register':
+                        container.innerHTML = this.renderRegisterView();
+                        this.setupRegisterHandlers();
+                        break;
+                    case 'login':
+                        container.innerHTML = this.renderLoginView();
+                        this.setupLoginHandlers();
+                        break;
+                    case 'user_dashboard':
+                        if (!this.currentUser || this.currentUser.isAdmin) {
+                            this.navigate('login');
+                            return;
+                        }
+                        container.innerHTML = this.renderUserDashboard();
+                        this.setupUserHandlers();
+                        break;
+                    case 'admin_dashboard':
+                        if (!this.currentUser || !this.currentUser.isAdmin) {
+                            this.navigate('login');
+                            return;
+                        }
+                        container.innerHTML = this.renderAdminDashboard();
+                        this.setupReviewHandlers();
+                        break;
+                    default:
+                        container.innerHTML = this.renderHomeView();
+                }
+            }
+
+            renderNavActions() {
+                const nav = document.getElementById('nav-actions');
+                if (!this.currentUser) {
+                    nav.innerHTML = `
+                        <button onclick="app.navigate('login')" class="px-4 py-2 text-xs sm:text-sm font-semibold bg-unram-500 hover:bg-amber-600 text-unram-navy rounded-xl transition shadow">
+                            <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Login
+                        </button>
+                        <button onclick="app.navigate('register')" class="px-4 py-2 text-xs sm:text-sm font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl transition">
+                            <i class="fa-solid fa-user-plus mr-1.5"></i> Daftar Anggota
+                        </button>
+                    `;
+                } else {
+                    nav.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <img src="${this.currentUser.photo || 'https://placehold.co/100x100?text=User'}" class="w-9 h-9 rounded-full object-cover border-2 border-amber-400 shadow">
+                            <span class="text-sm font-medium hidden sm:inline">${this.currentUser.name}</span>
+                            <button onclick="app.logout()" class="px-3 py-1.5 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition shadow">
+                                <i class="fa-solid fa-power-off mr-1"></i> Keluar
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('kpn_current_user');
+                this.navigate('home');
+                this.showAlert('Berhasil Keluar', 'Anda telah keluar dari sistem.', 'success');
+            }
+
+            renderHomeView() {
+                return `
+                    <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
+                        <!-- Hero Wallpaper Section -->
+                        <div class="relative rounded-3xl overflow-hidden shadow-2xl mb-12 text-white p-8 sm:p-16 text-center" style="background: linear-gradient(rgba(30, 58, 138, 0.88), rgba(23, 37, 84, 0.92)), url('${WALLPAPER_URL}'); background-size: cover; background-position: center;">
+                            <div class="max-w-3xl mx-auto relative z-10">
+                                <div class="inline-flex items-center space-x-2 bg-amber-400 text-unram-navy px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6 shadow">
+                                    <i class="fa-solid fa-award"></i> Koperasi Pegawai Negeri Resmi UNRAM
+                                </div>
+                                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6 leading-tight text-white drop-shadow-md">
+                                    Selamat Datang di Portal <span class="text-amber-300">KPN Universitas Mataram</span>
+                                </h1>
+                                <p class="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto mb-8 leading-relaxed">
+                                    Layanan terpadu pendaftaran anggota, pengelolaan profil pegawai/dosen, pengajuan pinjaman dengan bunga ringan 10%, serta laporan setoran otomatis setiap bulan.
+                                </p>
+
+                                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                                    <button onclick="app.navigate('register')" class="px-8 py-4 bg-unram-500 hover:bg-amber-400 text-unram-navy font-bold rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 text-base flex items-center justify-center space-x-2">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                        <span>Daftar / Isi Profil Anggota Baru</span>
+                                    </button>
+                                    <button onclick="app.navigate('login')" class="px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 text-base flex items-center justify-center space-x-2 backdrop-blur-sm">
+                                        <i class="fa-solid fa-right-to-bracket"></i>
+                                        <span>Masuk ke Akun (Login)</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-12">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                                <div class="w-12 h-12 rounded-xl bg-blue-100 text-unram-navy flex items-center justify-center text-xl mb-4">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-lg mb-2">1. Profil Terintegrasi</h3>
+                                <p class="text-sm text-slate-600 leading-relaxed">Kelola profil pegawai/dosen, foto, NIP, golongan, dan unit fakultas dengan aman.</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                                <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-4">
+                                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-lg mb-2">2. Pengajuan Pinjaman</h3>
+                                <p class="text-sm text-slate-600 leading-relaxed">Ajukan pinjaman pertama hingga ke-6+ dengan tenor 1–60 bulan dan skema simulasi transparan.</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                                <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl mb-4">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-lg mb-2">3. Setoran & Auto-Lunas</h3>
+                                <p class="text-sm text-slate-600 leading-relaxed">Laporan setoran bulanan yang terbarui real-time dan terhapus otomatis setelah lunas.</p>
+                            </div>
+                        </div>
+
+                        <!-- Google Docs Direct Download Section -->
+                        <div class="bg-gradient-to-r from-unram-navy to-blue-900 rounded-3xl p-8 text-white text-left shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div class="md:w-1/3">
+                                <div class="inline-flex items-center space-x-2 bg-amber-400 text-unram-navy px-3 py-1 rounded-full text-xs font-bold uppercase mb-2">
+                                    <i class="fa-solid fa-folder-open"></i> Berkas Resmi KPN
+                                </div>
+                                <h3 class="text-2xl font-bold">Pusat Unduhan & Slideshow</h3>
+                                <p class="text-sm text-slate-200 mt-1">Unduh draf Formulir, Perjanjian, atau Tampilkan Slideshow Anggota Belum Setor.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row flex-wrap justify-end gap-3 w-full md:w-2/3">
+                                <button onclick="app.downloadBlangkoDoc('docx')" class="px-4 py-3 bg-amber-500 hover:bg-amber-400 text-unram-navy font-bold rounded-xl text-xs transition shadow flex items-center justify-center space-x-2 whitespace-nowrap">
+                                    <i class="fa-solid fa-file-word text-base"></i>
+                                    <span>Blangko (.docx)</span>
+                                </button>
+                                <button onclick="app.downloadPerjanjianDoc('docx')" class="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs transition border border-white/20 flex items-center justify-center space-x-2 whitespace-nowrap">
+                                    <i class="fa-solid fa-file-signature text-base text-amber-300"></i>
+                                    <span>Perjanjian (.docx)</span>
+                                </button>
+                                <button onclick="app.openSlidesModal()" class="px-4 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-xs transition shadow flex items-center justify-center space-x-2 whitespace-nowrap">
+                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
+                                    <span>Slideshow Anggota Belum Setor</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderRegisterView() {
+                return `
+                    <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-10">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-900">Formulir Pendaftaran Anggota KPN</h2>
+                            <p class="text-sm text-slate-500 mt-1">Lengkapi data profil pegawai/dosen Universitas Mataram</p>
+                        </div>
+
+                        <form id="register-form" class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Foto Profil *</label>
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-20 h-20 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden shrink-0 relative">
+                                        <i id="photo-preview-icon" class="fa-solid fa-camera text-2xl text-slate-400"></i>
+                                        <img id="photo-preview-img" class="w-full h-full object-cover hidden">
+                                    </div>
+                                    <div class="flex-grow">
+                                        <input type="file" id="photo-file" accept="image/png, image/jpeg" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-unram-navy file:text-white hover:file:bg-blue-900 cursor-pointer">
+                                        <p class="text-[11px] text-slate-400 mt-1">Format JPG/PNG maks 2MB.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Lengkap & Gelar *</label>
+                                    <input type="text" name="name" required placeholder="Contoh: Dr. Ir. Ahmad Dahlan, M.Si" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">NIP (Nomor Induk Pegawai) *</label>
+                                    <input type="text" name="nip" required placeholder="19800101..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">No. HP / WhatsApp *</label>
+                                    <input type="tel" name="phone" required placeholder="08123456789" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tempat & Tanggal Lahir *</label>
+                                    <input type="text" name="birthplace" required placeholder="Mataram, 15-08-1985" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Status Kepegawaian *</label>
+                                    <select name="status" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none bg-white">
+                                        <option value="Dosen PNS">Dosen PNS</option>
+                                        <option value="Dosen Non-PNS / PPPK">Dosen Non-PNS / PPPK</option>
+                                        <option value="Pegawai / Tendik PNS">Pegawai / Tendik PNS</option>
+                                        <option value="Pegawai PPPK">Pegawai PPPK</option>
+                                        <option value="Pegawai Honorer">Pegawai Honorer</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Golongan / Pangkat *</label>
+                                    <input type="text" name="golongan" required placeholder="Contoh: III/c / Penata" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unit Kerja / Fakultas *</label>
+                                    <select name="unit" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none bg-white">
+                                        ${FACULTIES.map(f => `<option value="${f}">${f}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password *</label>
+                                    <input type="password" name="password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Konfirmasi Password *</label>
+                                    <input type="password" name="confirm_password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3 pt-2">
+                                <input type="checkbox" id="agreement-check" name="agreement" required class="mt-1 w-4 h-4 text-unram-navy rounded border-slate-300 focus:ring-unram-500 cursor-pointer">
+                                <label for="agreement-check" class="text-xs text-slate-700 cursor-pointer leading-relaxed select-none">
+                                    Saya menyatakan bahwa data yang saya masukkan adalah benar dan dapat dipertanggungjawabkan
+                                </label>
+                            </div>
+
+                            <div class="pt-4">
+                                <button type="submit" class="w-full py-3.5 bg-unram-navy hover:bg-blue-900 text-white font-bold rounded-2xl shadow-md transition text-sm">
+                                    Daftar Anggota Sekarang
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            }
+
+            renderLoginView() {
+                return `
+                    <div class="max-w-md mx-auto bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-8">
+                        <div class="text-center mb-6">
+                            <div class="w-14 h-14 bg-unram-navy text-amber-400 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-slate-900">Masuk ke Akun KPN</h2>
+                            <p class="text-xs text-slate-500 mt-1">Masukkan NIP dan Password Anda</p>
+                        </div>
+
+                        <form id="login-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">NIP *</label>
+                                <input type="text" name="nip" required placeholder="Masukkan NIP Anda" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password *</label>
+                                <div class="relative">
+                                    <input type="password" id="login-password" name="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none pr-10">
+                                    <button type="button" onclick="app.togglePasswordVisibility('login-password', 'eye-icon')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                                        <i id="eye-icon" class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full py-3 bg-unram-500 hover:bg-amber-600 text-unram-navy font-bold rounded-xl shadow transition text-sm">
+                                Masuk Sistem
+                            </button>
+                        </form>
+                    </div>
+                `;
+            }
+
+            renderUserDashboard() {
+                const u = this.currentUser;
+                const loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                const myLoans = loans.filter(l => l.nip === u.nip);
+
+                return `
+                    <div class="space-y-8 pb-12">
+                        <!-- Profile Card -->
+                        <div class="bg-gradient-to-r from-unram-navy to-blue-900 text-white rounded-3xl p-6 sm:p-8 shadow-md">
+                            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                                <img src="${u.photo || 'https://placehold.co/150x150?text=Foto'}" class="w-24 h-24 rounded-2xl object-cover border-4 border-amber-400 shadow-md">
+                                <div class="text-center sm:text-left flex-grow">
+                                    <span class="px-3 py-1 bg-amber-400 text-unram-navy text-xs font-bold rounded-full mb-2 inline-block">${u.status || 'Anggota KPN'}</span>
+                                    <h2 class="text-2xl font-bold">${u.name}</h2>
+                                    <p class="text-xs text-amber-200 mt-1">NIP: ${u.nip} &bull; Golongan: ${u.golongan}</p>
+                                    <p class="text-xs text-slate-300 mt-0.5">Unit Kerja: ${u.unit} &bull; HP: ${u.phone}</p>
+                                </div>
+                                <button onclick="app.openLoanModal()" class="px-6 py-3.5 bg-unram-500 hover:bg-amber-600 text-unram-navy font-bold rounded-2xl shadow-lg transition flex items-center space-x-2 shrink-0">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    <span>Ajukan Pinjaman Baru</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Downloads Box -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div>
+                                <h4 class="font-bold text-amber-900 text-base flex items-center">
+                                    <i class="fa-solid fa-folder-open text-amber-600 mr-2"></i> Dokumen & Informasi Resmi
+                                </h4>
+                                <p class="text-xs text-amber-800 mt-1">Unduh blangko permohonan, perjanjian, atau tampilkan slideshow daftar nama anggota belum setor.</p>
+                            </div>
+                            <div class="flex flex-wrap justify-end gap-2 mt-2 sm:mt-0">
+                                <button onclick="app.downloadBlangkoDoc('docx')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-unram-navy font-bold rounded-xl text-xs shadow transition flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Blangko</span>
+                                </button>
+                                <button onclick="app.downloadPerjanjianDoc('docx')" class="px-4 py-2 bg-unram-navy hover:bg-blue-900 text-white font-bold rounded-xl text-xs shadow transition flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-file-contract"></i>
+                                    <span>Perjanjian</span>
+                                </button>
+                                <button onclick="app.openSlidesModal()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow transition flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-person-chalkboard"></i>
+                                    <span>Slideshow</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loan History -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                            <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center">
+                                <i class="fa-solid fa-clock-rotate-left text-unram-navy mr-2.5"></i> Riwayat & Status Pinjaman Anda
+                            </h3>
+                            ${myLoans.length === 0 ? `
+                                <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3 block"></i>
+                                    <p class="text-slate-500 text-sm font-medium">Anda belum memiliki riwayat pengajuan pinjaman.</p>
+                                    <button onclick="app.openLoanModal()" class="mt-3 px-4 py-2 bg-unram-navy text-white font-bold rounded-xl text-xs">
+                                        Ajukan Pinjaman Sekarang
+                                    </button>
+                                </div>
+                            ` : `
+                                <div class="space-y-6">
+                                    ${myLoans.map(loan => this.renderLoanCard(loan)).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+
+                    <!-- Loan Application Modal -->
+                    <div id="loan-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+                        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 sm:p-8 my-8">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
+                                <h3 class="text-xl font-bold text-slate-900 flex items-center">
+                                    <i class="fa-solid fa-hand-holding-dollar text-unram-navy mr-2"></i> Formulir Pengajuan Pinjaman
+                                </h3>
+                                <button onclick="app.closeLoanModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+
+                            <form id="loan-form" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Jumlah Pinjaman (Rp) *</label>
+                                        <input type="number" id="loan-amount" required step="500000" min="1000000" value="10000000" oninput="app.calculateLoan()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Jangka Waktu (Bulan: 1–60) *</label>
+                                        <input type="number" id="loan-duration" required min="1" max="60" value="12" oninput="app.calculateLoan()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sisa Gaji Bersih Terakhir (Rp) *</label>
+                                        <input type="number" id="loan-rem-salary" required step="100000" placeholder="Contoh: 3500000" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Alasan Pengajuan *</label>
+                                        <input type="text" id="loan-reason" required placeholder="Contoh: Renovasi rumah / Biaya pendidikan" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 focus:outline-none">
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 grid grid-cols-3 gap-2 text-center text-xs">
+                                    <div><span class="text-slate-500 block">Pokok:</span><strong id="calc-pokok" class="text-slate-900 font-bold">Rp 0</strong></div>
+                                    <div><span class="text-slate-500 block">Bunga Total:</span><strong id="calc-bunga" class="text-amber-700 font-bold">Rp 0</strong></div>
+                                    <div><span class="text-slate-500 block">Cicilan/Bulan:</span><strong id="calc-cicilan" class="text-unram-navy font-extrabold text-sm">Rp 0</strong></div>
+                                </div>
+
+                                <div class="space-y-3 pt-2">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unggah Slip Gaji (JPG/PNG) *</label>
+                                        <input type="file" id="loan-slip-file" required accept="image/png, image/jpeg" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unggah Foto Blangko Permohonan *</label>
+                                        <input type="file" id="loan-form-blangko" required accept="image/png, image/jpeg" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 cursor-pointer">
+                                    </div>
+                                    <div id="collateral-container" class="hidden">
+                                        <label class="block text-xs font-bold text-rose-700 uppercase tracking-wider mb-1">Foto Agunan (Wajib untuk Pinjaman &ge; Rp 30 Juta) *</label>
+                                        <input type="file" id="loan-collateral" accept="image/png, image/jpeg" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-100 file:text-rose-800 hover:file:bg-rose-200 cursor-pointer">
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                                    <button type="button" onclick="app.closeLoanModal()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100">Batal</button>
+                                    <button type="submit" class="px-6 py-2.5 bg-unram-navy hover:bg-blue-900 text-white font-bold rounded-xl text-sm shadow">Kirim Pengajuan Pinjaman</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderLoanCard(loan) {
+                let statusBadge = '';
+                if (loan.status === 'Pending') {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock mr-1"></i> Menunggu Persetujuan Admin</span>`;
+                } else if (loan.status === 'Disetujui') {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check-circle mr-1"></i> Disetujui</span>`;
+                } else {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800"><i class="fa-solid fa-xmark-circle mr-1"></i> Ditolak</span>`;
+                }
+
+                return `
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-200">
+                            <div>
+                                <div class="text-xs text-slate-500 mb-1">ID Pengajuan: #${loan.id} &bull; Tanggal: ${loan.date}</div>
+                                <h4 class="text-lg font-bold text-slate-900">Pinjaman: Rp ${Number(loan.amount).toLocaleString('id-ID')} (${loan.duration} Bulan)</h4>
+                            </div>
+                            <div>${statusBadge}</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4 text-sm text-slate-600">
+                            <div><strong>Cicilan per Bulan:</strong><br><span class="text-unram-navy font-bold text-base">Rp ${Number(loan.monthlyInstallment || 0).toLocaleString('id-ID')}</span></div>
+                            <div><strong>Sisa Gaji:</strong><br>Rp ${Number(loan.remainingSalary).toLocaleString('id-ID')}</div>
+                            <div><strong>Alasan Pengajuan:</strong><br>${loan.reason}</div>
+                        </div>
+
+                        ${loan.adminReason ? `
+                            <div class="my-2 p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900">
+                                <strong class="block mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Catatan Admin (${loan.status}):</strong>
+                                ${loan.adminReason}
+                            </div>
+                        ` : ''}
+
+                        <div class="flex flex-wrap gap-2 pt-2 pb-2 text-xs">
+                            <button onclick="app.openDocModal('${loan.slipFile}', 'Slip Gaji')" class="px-3 py-1.5 bg-blue-50 text-unram-navy rounded-lg border border-blue-200 font-semibold hover:bg-blue-100"><i class="fa-solid fa-image mr-1"></i> Slip Gaji</button>
+                            <button onclick="app.openDocModal('${loan.formFile}', 'Blangko Permohonan')" class="px-3 py-1.5 bg-amber-50 text-amber-900 rounded-lg border border-amber-200 font-semibold hover:bg-amber-100"><i class="fa-solid fa-image mr-1"></i> Blangko</button>
+                            ${loan.collateralFile ? `<button onclick="app.openDocModal('${loan.collateralFile}', 'Agunan (BPKB/Sertifikat)')" class="px-3 py-1.5 bg-rose-50 text-rose-900 rounded-lg border border-rose-200 font-semibold hover:bg-rose-100"><i class="fa-solid fa-shield mr-1"></i> Agunan</button>` : ''}
+                        </div>
+
+                        ${loan.status === 'Disetujui' && loan.installments && loan.installments.length > 0 ? `
+                            <div class="mt-4 pt-4 border-t border-slate-200">
+                                <h5 class="font-bold text-slate-900 text-xs mb-3 flex items-center">
+                                    <i class="fa-solid fa-calendar-days text-unram-navy mr-2"></i> Laporan Setoran Bulanan (${loan.installments.filter(i=>i.paid).length}/${loan.installments.length} Lunas)
+                                </h5>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-slate-200 bg-white rounded-xl overflow-hidden text-xs">
+                                        <thead class="bg-slate-100 text-slate-700">
+                                            <tr>
+                                                <th class="px-3 py-2 text-left font-semibold">Bulan</th>
+                                                <th class="px-3 py-2 text-left font-semibold">Jatuh Tempo</th>
+                                                <th class="px-3 py-2 text-left font-semibold">Jumlah</th>
+                                                <th class="px-3 py-2 text-left font-semibold">Status</th>
+                                                <th class="px-3 py-2 text-left font-semibold">Ket</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 text-slate-600">
+                                            ${loan.installments.map(inst => `
+                                                <tr>
+                                                    <td class="px-3 py-2 font-medium">Ke-${inst.month}</td>
+                                                    <td class="px-3 py-2">${inst.dueDate}</td>
+                                                    <td class="px-3 py-2 font-semibold text-slate-900">Rp ${Number(inst.amount).toLocaleString('id-ID')}</td>
+                                                    <td class="px-3 py-2">
+                                                        ${inst.paid ? 
+                                                            `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check mr-1"></i> Lunas</span>` : 
+                                                            `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock mr-1"></i> Belum</span>`
+                                                        }
+                                                    </td>
+                                                    <td class="px-3 py-2 text-slate-500">${inst.note || '-'}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            renderAdminDashboard() {
+                const users = JSON.parse(localStorage.getItem('kpn_users')) || [];
+                const loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                let members = users.filter(u => !u.isAdmin);
+                if (this.adminUnitFilter && this.adminUnitFilter !== 'Semua') {
+                    members = members.filter(m => m.unit === this.adminUnitFilter);
+                }
+
+                return `
+                    <div class="space-y-8 pb-12">
+                        <div class="bg-unram-navy text-white rounded-3xl p-6 sm:p-8 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div>
+                                <div class="inline-block bg-unram-500 text-unram-navy text-xs font-bold px-3 py-1 rounded-full mb-2">Panel Administrator</div>
+                                <h2 class="text-2xl font-bold">Pengelolaan KPN Universitas Mataram</h2>
+                                <p class="text-xs text-slate-300 mt-1">Verifikasi anggota, setujui pinjaman, dan kelola setoran bulanan.</p>
+                            </div>
+                            <div class="flex gap-4 text-center">
+                                <div class="bg-white/10 px-5 py-3 rounded-2xl backdrop-blur">
+                                    <div class="text-2xl font-extrabold text-amber-400">${members.length}</div>
+                                    <div class="text-xs text-slate-300">Total Anggota</div>
+                                </div>
+                                <div class="bg-white/10 px-5 py-3 rounded-2xl backdrop-blur">
+                                    <div class="text-2xl font-extrabold text-amber-400">${loans.length}</div>
+                                    <div class="text-xs text-slate-300">Pinjaman Aktif</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loan Requests Queue -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                            <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center">
+                                <i class="fa-solid fa-clipboard-check text-unram-navy mr-2.5"></i> Pengajuan Pinjaman Masuk
+                            </h3>
+                            ${loans.length === 0 ? `
+                                <p class="text-slate-500 text-sm text-center py-8">Belum ada pengajuan pinjaman aktif.</p>
+                            ` : `
+                                <div class="space-y-6">
+                                    ${loans.map(loan => {
+                                        const applicant = users.find(u => u.nip === loan.nip) || { name: loan.nip, unit: '-' };
+                                        return `
+                                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-200">
+                                                    <div>
+                                                        <span class="text-xs font-bold text-unram-navy bg-blue-100 px-2.5 py-1 rounded-md">NIP: ${loan.nip}</span>
+                                                        <h4 class="text-base font-bold text-slate-900 mt-1">
+                                                            Peminjam: <span class="text-unram-navy">${applicant.name}</span> 
+                                                            <span class="text-xs text-slate-500 font-normal">(${applicant.unit})</span>
+                                                        </h4>
+                                                    </div>
+                                                    <button onclick="app.openReviewModal('${loan.id}')" class="px-4 py-2 bg-unram-navy hover:bg-blue-900 text-white font-bold rounded-xl text-xs shadow transition flex items-center space-x-1.5">
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                        <span>${loan.status === 'Pending' ? 'Review & Keputusan' : 'Ubah Keputusan'}</span>
+                                                    </button>
+                                                </div>
+                                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 text-xs text-slate-600">
+                                                    <div><strong>Jumlah:</strong><br>Rp ${Number(loan.amount).toLocaleString('id-ID')}</div>
+                                                    <div><strong>Tenor:</strong><br>${loan.duration} Bulan</div>
+                                                    <div><strong>Cicilan:</strong><br><span class="text-unram-navy font-bold">Rp ${Number(loan.monthlyInstallment || 0).toLocaleString('id-ID')}</span></div>
+                                                    <div><strong>Status:</strong><br><span class="font-bold ${loan.status === 'Disetujui' ? 'text-emerald-600' : loan.status === 'Ditolak' ? 'text-rose-600' : 'text-amber-600'}">${loan.status}</span></div>
+                                                </div>
+                                                ${loan.adminReason ? `
+                                                    <div class="my-2 p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900">
+                                                        <strong>Catatan Admin:</strong> ${loan.adminReason}
+                                                    </div>
+                                                ` : ''}
+                                                <div class="flex flex-wrap gap-2 pt-2 text-xs">
+                                                    <button onclick="app.openDocModal('${loan.slipFile}', 'Slip Gaji')" class="px-3 py-1 bg-blue-50 text-unram-navy rounded-lg border border-blue-200 hover:bg-blue-100">Slip Gaji</button>
+                                                    <button onclick="app.openDocModal('${loan.formFile}', 'Blangko')" class="px-3 py-1 bg-amber-50 text-amber-900 rounded-lg border border-amber-200 hover:bg-amber-100">Blangko</button>
+                                                    ${loan.collateralFile ? `<button onclick="app.openDocModal('${loan.collateralFile}', 'Agunan')" class="px-3 py-1 bg-rose-50 text-rose-900 rounded-lg border border-rose-200 hover:bg-rose-100">Agunan</button>` : ''}
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            `}
+                        </div>
+
+                        <!-- Member Directory -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                                <h3 class="text-xl font-bold text-slate-900 flex items-center shrink-0">
+                                    <i class="fa-solid fa-users text-unram-navy mr-2.5"></i> Direktori Anggota
+                                </h3>
+                                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                                    <button onclick="app.openSlidesModal()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow transition flex items-center space-x-1.5">
+                                        <i class="fa-solid fa-person-chalkboard"></i>
+                                        <span>Slideshow Belum Setor</span>
+                                    </button>
+                                    <div class="flex items-center space-x-2">
+                                        <label class="text-xs font-bold text-slate-700 whitespace-nowrap">Filter Unit:</label>
+                                        <select onchange="app.setAdminUnitFilter(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-unram-500 focus:outline-none bg-white">
+                                            <option value="Semua" ${this.adminUnitFilter === 'Semua' ? 'selected' : ''}>Semua Unit / Fakultas</option>
+                                            ${FACULTIES.map(f => `<option value="${f}" ${this.adminUnitFilter === f ? 'selected' : ''}>${f}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-slate-200 text-xs sm:text-sm">
+                                    <thead class="bg-slate-100 text-slate-700">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-semibold">Nama</th>
+                                            <th class="px-4 py-3 text-left font-semibold">NIP</th>
+                                            <th class="px-4 py-3 text-left font-semibold">Pass</th>
+                                            <th class="px-4 py-3 text-left font-semibold">Status/Gol</th>
+                                            <th class="px-4 py-3 text-left font-semibold">Unit</th>
+                                            <th class="px-4 py-3 text-left font-semibold">Setoran Aktif</th>
+                                            <th class="px-4 py-3 text-center font-semibold">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 text-slate-600">
+                                        ${members.map(m => {
+                                            const mLoans = loans.filter(l => l.nip === m.nip && l.status === 'Disetujui');
+                                            let setoranContent = '<span class="text-slate-400">Tidak ada</span>';
+                                            if (mLoans.length > 0) {
+                                                setoranContent = mLoans.map(appLoan => {
+                                                    const paidCount = appLoan.installments ? appLoan.installments.filter(i => i.paid).length : 0;
+                                                    const totalCount = appLoan.installments ? appLoan.installments.length : 0;
+                                                    return `
+                                                        <div class="mb-1 bg-slate-50 p-2 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+                                                            <span class="font-bold text-[11px]">#${appLoan.id}: ${paidCount}/${totalCount} Lunas</span>
+                                                            <button onclick="app.openInstallmentEditor('${appLoan.id}')" class="px-2 py-0.5 bg-amber-500 hover:bg-amber-600 text-unram-navy font-bold text-[10px] rounded-lg transition shadow">Edit</button>
+                                                        </div>
+                                                    `;
+                                                }).join('');
+                                            }
+                                            return `
+                                                <tr>
+                                                    <td class="px-4 py-3 font-bold text-slate-900">${m.name}</td>
+                                                    <td class="px-4 py-3 font-mono">${m.nip}</td>
+                                                    <td class="px-4 py-3"><span class="bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded text-xs font-bold">${m.password}</span></td>
+                                                    <td class="px-4 py-3">${m.status} (${m.golongan})</td>
+                                                    <td class="px-4 py-3">${m.unit}</td>
+                                                    <td class="px-4 py-3">${setoranContent}</td>
+                                                    <td class="px-4 py-3 text-center">
+                                                        <button onclick="app.confirmDeleteMember('${m.nip}', '${m.name.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] rounded-lg transition shadow">
+                                                            Hapus
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Modal -->
+                    <div id="review-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8">
+                            <h3 class="text-xl font-bold text-slate-900 mb-4">Review & Decisions Admin</h3>
+                            <form id="review-form" class="space-y-4">
+                                <input type="hidden" id="review-loan-id">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Keputusan *</label>
+                                    <select id="review-status" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500 bg-white">
+                                        <option value="Disetujui">Setujui</option>
+                                        <option value="Ditolak">Tolak</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Jumlah (Rp)</label>
+                                        <input type="number" id="review-amount" required step="500000" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tenor (Bulan)</label>
+                                        <input type="number" id="review-duration" required min="1" max="60" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Catatan Admin *</label>
+                                    <textarea id="review-reason" required rows="3" placeholder="Catatan persetujuan/penolakan..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-unram-500"></textarea>
+                                </div>
+                                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200">
+                                    <button type="button" onclick="app.closeReviewModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-medium">Batal</button>
+                                    <button type="submit" class="px-5 py-2 bg-unram-navy text-white font-bold rounded-xl text-xs shadow">Simpan Keputusan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Installment Editor Modal -->
+                    <div id="installment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                        <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full p-6 sm:p-8 my-8 max-h-[90vh] flex flex-col">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4 shrink-0">
+                                <h3 class="text-xl font-bold text-slate-900">Edit Status Setoran Bulanan</h3>
+                                <button onclick="app.closeInstallmentEditorModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <form id="installment-editor-form" class="space-y-4 flex flex-col flex-grow overflow-hidden">
+                                <input type="hidden" id="edit-install-loan-id">
+                                <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl border border-amber-200 shrink-0 text-xs">
+                                    <span class="font-bold text-amber-900">Jika seluruh bulan ditandai Lunas, pinjaman otomatis terhapus dari sistem.</span>
+                                    <div class="flex space-x-2">
+                                        <button type="button" onclick="app.markAllInstallments(true)" class="px-2.5 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold">Semua Lunas</button>
+                                        <button type="button" onclick="app.markAllInstallments(false)" class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded text-[10px] font-bold">Semua Belum</button>
+                                    </div>
+                                </div>
+                                <div id="installment-rows-container" class="space-y-3 overflow-y-auto flex-grow pr-2"></div>
+                                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200 shrink-0">
+                                    <button type="button" onclick="app.closeInstallmentEditorModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-medium">Batal</button>
+                                    <button type="submit" class="px-5 py-2 bg-unram-500 text-unram-navy font-bold rounded-xl text-xs shadow">Simpan Perubahan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setupRegisterHandlers() {
+                const form = document.getElementById('register-form');
+                const fileInput = document.getElementById('photo-file');
+                let uploadedPhotoBase64 = '';
+
+                if (fileInput) {
+                    fileInput.onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                uploadedPhotoBase64 = event.target.result;
+                                document.getElementById('photo-preview-img').src = uploadedPhotoBase64;
+                                document.getElementById('photo-preview-img').classList.remove('hidden');
+                                document.getElementById('photo-preview-icon').classList.add('hidden');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+                }
+
+                if (form) {
+                    form.onsubmit = (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        const password = formData.get('password');
+                        const confirmPassword = formData.get('confirm_password');
+                        const agreement = formData.get('agreement');
+
+                        if (!agreement) {
+                            this.showAlert('Pernyataan Wajib', 'Anda harus menyetujui pernyataan kebenaran data terlebih dahulu.', 'error');
+                            return;
+                        }
+
+                        if (password !== confirmPassword) {
+                            this.showAlert('Password Tidak Cocok', 'Password dan Konfirmasi Password harus sama.', 'error');
+                            return;
+                        }
+
+                        const name = formData.get('name');
+                        const newUser = {
+                            name: name,
+                            nip: formData.get('nip').trim(),
+                            birthplace: formData.get('birthplace'),
+                            phone: formData.get('phone'),
+                            golongan: formData.get('golongan'),
+                            status: formData.get('status'),
+                            unit: formData.get('unit'),
+                            photo: uploadedPhotoBase64 || `https://placehold.co/150x150/1e3a8a/ffffff?text=${encodeURIComponent(name.split(' ')[0])}`,
+                            password: password,
+                            isAdmin: false
+                        };
+
+                        let users = JSON.parse(localStorage.getItem('kpn_users')) || [];
+                        if (users.some(u => u.nip === newUser.nip)) {
+                            this.showAlert('Pendaftaran Gagal', 'NIP tersebut sudah terdaftar.', 'error');
+                            return;
+                        }
+
+                        users.push(newUser);
+                        localStorage.setItem('kpn_users', JSON.stringify(users));
+                        this.showAlert('Pendaftaran Berhasil', 'Akun berhasil dibuat. Silakan login dengan NIP dan Password Anda.', 'success', () => {
+                            this.navigate('login');
+                        });
+                    };
+                }
+            }
+
+            togglePasswordVisibility(inputId, iconId) {
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            }
+
+            setupLoginHandlers() {
+                const form = document.getElementById('login-form');
+                if (form) {
+                    form.onsubmit = (e) => {
+                        e.preventDefault();
+                        const nip = form.querySelector('[name="nip"]').value.trim();
+                        const password = form.querySelector('[name="password"]').value;
+
+                        let users = JSON.parse(localStorage.getItem('kpn_users')) || [];
+                        const user = users.find(u => u.nip === nip && u.password === password);
+
+                        if (!user) {
+                            this.showAlert('Login Gagal', 'NIP atau Password salah.', 'error');
+                            return;
+                        }
+
+                        this.currentUser = user;
+                        localStorage.setItem('kpn_current_user', JSON.stringify(user));
+                        this.showAlert('Login Berhasil', `Selamat datang, ${user.name}!`, 'success', () => {
+                            this.navigate(user.isAdmin ? 'admin_dashboard' : 'user_dashboard');
+                        });
+                    };
+                }
+            }
+
+            openLoanModal() {
+                document.getElementById('loan-modal').classList.remove('hidden');
+                this.calculateLoan();
+            }
+
+            closeLoanModal() {
+                document.getElementById('loan-modal').classList.add('hidden');
+            }
+
+            openDocModal(url, title) {
+                document.getElementById('doc-modal-title').textContent = title;
+                document.getElementById('doc-modal-img').src = url;
+                document.getElementById('doc-modal').classList.remove('hidden');
+            }
+
+            closeDocModal() {
+                document.getElementById('doc-modal').classList.add('hidden');
+            }
+
+            openSlidesModal() {
+                document.getElementById('slides-modal').classList.remove('hidden');
+            }
+
+            closeSlidesModal() {
+                document.getElementById('slides-modal').classList.add('hidden');
+            }
+
+            downloadBlangkoDoc(format = 'docx') {
+                const url = format === 'pdf' ? DOC_LINKS.blangko.downloadPdf : DOC_LINKS.blangko.downloadDocx;
+                window.open(url, '_blank');
+            }
+
+            downloadPerjanjianDoc(format = 'docx') {
+                const url = format === 'pdf' ? DOC_LINKS.perjanjian.downloadPdf : DOC_LINKS.perjanjian.downloadDocx;
+                window.open(url, '_blank');
+            }
+
+            calculateLoan() {
+                const amount = parseFloat(document.getElementById('loan-amount').value) || 0;
+                const duration = parseInt(document.getElementById('loan-duration').value) || 12;
+
+                const collateralContainer = document.getElementById('collateral-container');
+                if (amount >= 30000000) {
+                    collateralContainer.classList.remove('hidden');
+                } else {
+                    collateralContainer.classList.add('hidden');
+                }
+
+                const totalInterest = amount * 0.10 * (duration / 12);
+                const totalPayment = amount + totalInterest;
+                const monthlyInstallment = duration > 0 ? Math.round(totalPayment / duration) : 0;
+
+                document.getElementById('calc-pokok').textContent = `Rp ${amount.toLocaleString('id-ID')}`;
+                document.getElementById('calc-bunga').textContent = `Rp ${Math.round(totalInterest).toLocaleString('id-ID')}`;
+                document.getElementById('calc-cicilan').textContent = `Rp ${monthlyInstallment.toLocaleString('id-ID')}`;
+            }
+
+            setupUserHandlers() {
+                const loanForm = document.getElementById('loan-form');
+                if (loanForm) {
+                    let slipBase64 = '', blangkoBase64 = '', collateralBase64 = '';
+
+                    document.getElementById('loan-slip-file').onchange = (e) => {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => { slipBase64 = ev.target.result; };
+                        reader.readAsDataURL(e.target.files[0]);
+                    };
+                    document.getElementById('loan-form-blangko').onchange = (e) => {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => { blangkoBase64 = ev.target.result; };
+                        reader.readAsDataURL(e.target.files[0]);
+                    };
+                    const colInput = document.getElementById('loan-collateral');
+                    if (colInput) {
+                        colInput.onchange = (e) => {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => { collateralBase64 = ev.target.result; };
+                            reader.readAsDataURL(e.target.files[0]);
+                        };
+                    }
+
+                    loanForm.onsubmit = (e) => {
+                        e.preventDefault();
+                        const amount = parseFloat(document.getElementById('loan-amount').value);
+                        const duration = parseInt(document.getElementById('loan-duration').value);
+                        const remainingSalary = parseFloat(document.getElementById('loan-rem-salary').value);
+                        const reason = document.getElementById('loan-reason').value;
+
+                        const totalInterest = amount * 0.10 * (duration / 12);
+                        const monthlyInstallment = Math.round((amount + totalInterest) / duration);
+
+                        const installments = [];
+                        const now = new Date();
+                        for (let i = 1; i <= duration; i++) {
+                            const dueDateObj = new Date(now.getFullYear(), now.getMonth() + i, 10);
+                            installments.push({
+                                month: i,
+                                dueDate: dueDateObj.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
+                                amount: monthlyInstallment,
+                                paid: false,
+                                note: ''
+                            });
+                        }
+
+                        const newLoan = {
+                            id: Date.now().toString().slice(-6),
+                            nip: this.currentUser.nip,
+                            amount,
+                            duration,
+                            remainingSalary,
+                            slipFile: slipBase64 || 'https://placehold.co/300x400?text=Slip+Gaji',
+                            formFile: blangkoBase64 || 'https://placehold.co/300x400?text=Blangko',
+                            collateralFile: collateralBase64 || '',
+                            reason,
+                            monthlyInstallment,
+                            status: 'Pending',
+                            date: new Date().toLocaleDateString('id-ID'),
+                            installments
+                        };
+
+                        let loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                        loans.push(newLoan);
+                        localStorage.setItem('kpn_loans', JSON.stringify(loans));
+                        this.closeLoanModal();
+                        this.showAlert('Pengajuan Dikirim', 'Pengajuan pinjaman berhasil dikirim.', 'success', () => {
+                            this.render();
+                        });
+                    };
+                }
+            }
+
+            openReviewModal(loanId) {
+                const loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                const loan = loans.find(l => l.id === loanId);
+                if (loan) {
+                    document.getElementById('review-loan-id').value = loan.id;
+                    document.getElementById('review-status').value = loan.status === 'Pending' ? 'Disetujui' : loan.status;
+                    document.getElementById('review-amount').value = loan.amount;
+                    document.getElementById('review-duration').value = loan.duration;
+                    document.getElementById('review-reason').value = loan.adminReason || '';
+                    document.getElementById('review-modal').classList.remove('hidden');
+                }
+            }
+
+            closeReviewModal() {
+                document.getElementById('review-modal').classList.add('hidden');
+            }
+
+            setupReviewHandlers() {
+                const form = document.getElementById('review-form');
+                if (form) {
+                    form.onsubmit = (e) => {
+                        e.preventDefault();
+                        const loanId = document.getElementById('review-loan-id').value;
+                        const status = document.getElementById('review-status').value;
+                        const amount = parseFloat(document.getElementById('review-amount').value);
+                        const duration = parseInt(document.getElementById('review-duration').value);
+                        const adminReason = document.getElementById('review-reason').value;
+
+                        let loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                        const loan = loans.find(l => l.id === loanId);
+                        if (loan) {
+                            loan.status = status;
+                            loan.amount = amount;
+                            loan.duration = duration;
+                            loan.adminReason = adminReason;
+
+                            if (status === 'Disetujui') {
+                                const totalInterest = amount * 0.10 * (duration / 12);
+                                const monthlyInstallment = Math.round((amount + totalInterest) / duration);
+                                loan.monthlyInstallment = monthlyInstallment;
+
+                                const installments = [];
+                                const now = new Date();
+                                for (let i = 1; i <= duration; i++) {
+                                    const dueDateObj = new Date(now.getFullYear(), now.getMonth() + i, 10);
+                                    installments.push({
+                                        month: i,
+                                        dueDate: dueDateObj.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
+                                        amount: monthlyInstallment,
+                                        paid: false,
+                                        note: ''
+                                    });
+                                }
+                                loan.installments = installments;
+                            } else {
+                                loan.installments = [];
+                            }
+
+                            localStorage.setItem('kpn_loans', JSON.stringify(loans));
+                        }
+                        this.closeReviewModal();
+                        this.showAlert('Berhasil', 'Status pengajuan diperbarui.', 'success', () => {
+                            this.render();
+                        });
+                    };
+                }
+
+                const editInstallForm = document.getElementById('installment-editor-form');
+                if (editInstallForm) {
+                    editInstallForm.onsubmit = (e) => {
+                        e.preventDefault();
+                        const loanId = document.getElementById('edit-install-loan-id').value;
+                        let loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                        const loanIndex = loans.findIndex(l => l.id === loanId);
+                        if (loanIndex !== -1) {
+                            const loan = loans[loanIndex];
+                            if (loan.installments) {
+                                loan.installments.forEach(inst => {
+                                    const amtInput = document.getElementById(`edit-amt-${inst.month}`);
+                                    const dateInput = document.getElementById(`edit-date-${inst.month}`);
+                                    const noteInput = document.getElementById(`edit-note-${inst.month}`);
+                                    const paidInput = document.getElementById(`edit-paid-${inst.month}`);
+                                    if (amtInput) inst.amount = parseFloat(amtInput.value) || inst.amount;
+                                    if (dateInput) inst.dueDate = dateInput.value;
+                                    if (noteInput) inst.note = noteInput.value;
+                                    if (paidInput) inst.paid = paidInput.checked;
+                                });
+
+                                const allPaid = loan.installments.length > 0 && loan.installments.every(i => i.paid);
+                                if (allPaid) {
+                                    loans.splice(loanIndex, 1);
+                                    localStorage.setItem('kpn_loans', JSON.stringify(loans));
+                                    this.closeInstallmentEditorModal();
+                                    this.showAlert('Pinjaman Lunas & Dihapus', `Seluruh cicilan pinjaman #${loanId} telah lunas. Pinjaman otomatis dihapus dari sistem.`, 'success', () => {
+                                        this.render();
+                                    });
+                                    return;
+                                }
+                            }
+                            localStorage.setItem('kpn_loans', JSON.stringify(loans));
+                            this.closeInstallmentEditorModal();
+                            this.showAlert('Berhasil', 'Detail setoran berhasil diperbarui.', 'success', () => {
+                                this.render();
+                            });
+                        }
+                    };
+                }
+            }
+
+            markAllInstallments(status) {
+                const checkboxes = document.querySelectorAll('#installment-rows-container input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = status);
+            }
+
+            openInstallmentEditor(loanId) {
+                const loans = JSON.parse(localStorage.getItem('kpn_loans')) || [];
+                const loan = loans.find(l => l.id === loanId);
+                if (loan && loan.installments) {
+                    document.getElementById('edit-install-loan-id').value = loan.id;
+                    const container = document.getElementById('installment-rows-container');
+                    container.innerHTML = loan.installments.map(inst => `
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-2 items-center text-xs">
+                            <div>
+                                <span class="font-bold text-slate-700 block">Bulan Ke-${inst.month}</span>
+                                <input type="text" id="edit-date-${inst.month}" value="${inst.dueDate}" class="w-full mt-1 px-2.5 py-1 rounded-lg border border-slate-300">
+                            </div>
+                            <div>
+                                <span class="font-bold text-slate-700 block">Nominal (Rp)</span>
+                                <input type="number" id="edit-amt-${inst.month}" value="${inst.amount}" class="w-full mt-1 px-2.5 py-1 rounded-lg border border-slate-300">
+                            </div>
+                            <div>
+                                <span class="font-bold text-slate-700 block">Keterangan</span>
+                                <input type="text" id="edit-note-${inst.month}" value="${inst.note || ''}" placeholder="Catatan..." class="w-full mt-1 px-2.5 py-1 rounded-lg border border-slate-300">
+                            </div>
+                            <div class="flex items-center space-x-2 pt-3 sm:pt-0">
+                                <input type="checkbox" id="edit-paid-${inst.month}" ${inst.paid ? 'checked' : ''} class="w-4 h-4 text-emerald-600 rounded">
+                                <label for="edit-paid-${inst.month}" class="font-bold text-slate-700">Lunas</label>
+                            </div>
+                        </div>
+                    `).join('');
+                    document.getElementById('installment-modal').classList.remove('hidden');
+                }
+            }
+
+            closeInstallmentEditorModal() {
+                document.getElementById('installment-modal').classList.add('hidden');
+            }
+
+            setAdminUnitFilter(val) {
+                this.adminUnitFilter = val;
+                this.render();
+            }
+        }
+
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new KpnApp();
+        });
+    </script>
+</body>
+</html>
